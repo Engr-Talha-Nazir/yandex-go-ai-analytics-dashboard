@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Yandex Go Taxi Intelligence — AI Analytics Dashboard</title>
+<meta name="description" content="Single-file Power BI-style Yandex taxi analytics dashboard with demo data, filters, charts, AI insights, Moscow visuals and interactive analytics.">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Manrope:wght@700;800&display=swap');
+:root{
+--bg:#f4f4f0;--paper:#fff;--ink:#111;--muted:#747474;--line:#e7e7e1;
+--yellow:#ffdc00;--green:#14a66a;--red:#ef4352;--blue:#3977ff;--orange:#ff8b2b;
+--purple:#7b61ff;--cyan:#28a8c7;--shadow:0 20px 60px rgba(20,20,20,.08);--r:24px;
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:
+radial-gradient(circle at 0 0,rgba(255,220,0,.15),transparent 22%),
+linear-gradient(180deg,#f8f8f5,#efefea);color:var(--ink);font-family:Inter,system-ui,sans-serif;line-height:1.5}
+a{text-decoration:none;color:inherit}button,input,select{font:inherit}.wrap{width:96vw;margin:auto}
+.top{position:sticky;top:0;z-index:80;background:rgba(248,248,245,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(0,0,0,.07)}
+.topin{min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{display:flex;align-items:center;gap:12px}.logo{width:46px;height:46px;border-radius:14px;background:var(--yellow);display:grid;place-items:center;font-weight:900;box-shadow:0 12px 30px rgba(255,220,0,.28)}.brand strong{display:block}.brand small{display:block;color:#777;text-transform:uppercase;letter-spacing:.08em}.nav{display:flex;gap:20px;font-size:13px;font-weight:800;color:#555}.live{padding:9px 12px;border-radius:999px;background:#eafff4;color:#138054;border:1px solid #c9f5df;font-size:11px;font-weight:900}
+.hero{padding:24px 0 12px}.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:20px}.hero-card{min-height:520px;border-radius:32px;overflow:hidden;position:relative;box-shadow:var(--shadow)}
+.hero-main{padding:46px;color:white;background:
+linear-gradient(90deg,rgba(8,8,8,.95),rgba(8,8,8,.68) 52%,rgba(8,8,8,.18)),
+url("https://images.unsplash.com/photo-1513326738677-b964603b136d?auto=format&fit=crop&q=92&w=2200") center/cover}
+.eyebrow{display:inline-flex;padding:9px 13px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);font-size:12px;font-weight:800}
+h1{margin:20px 0 16px;font:800 clamp(50px,5.5vw,84px)/.94 Manrope,sans-serif;letter-spacing:-.055em;max-width:900px}.yellow{color:var(--yellow)}.hero-main p{max-width:720px;color:#ddd;font-size:18px}.chips{display:flex;gap:9px;flex-wrap:wrap;margin-top:24px}.chip{padding:8px 10px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.11);font-size:11px;font-weight:800}
+.hero-visual{background:linear-gradient(0deg,rgba(8,8,8,.74),rgba(8,8,8,.06)),url("https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&q=92&w=1900") center/cover}
+.visual-bottom{position:absolute;left:22px;right:22px;bottom:22px;display:grid;grid-template-columns:1fr 1fr;gap:12px}.glass{padding:18px;border-radius:20px;background:rgba(255,255,255,.88);backdrop-filter:blur(14px)}.glass.dark{background:rgba(17,17,17,.86);color:#fff}.glass small{display:block;color:#777;text-transform:uppercase;letter-spacing:.06em;font-weight:900}.glass.dark small{color:#aaa}.glass strong{display:block;font:800 24px Manrope,sans-serif;margin-top:4px}.glass span{font-size:12px;color:#777}.glass.dark span{color:#bbb}
+.gallery{display:grid;grid-template-columns:1.15fr .85fr .85fr;gap:18px;margin:18px 0}.photo{min-height:240px;border-radius:28px;overflow:hidden;position:relative;background-size:cover;background-position:center;box-shadow:var(--shadow)}.photo:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.66),transparent 60%)}.pcopy{position:absolute;left:20px;right:20px;bottom:17px;color:#fff;z-index:2}.pcopy strong{display:block;font:800 20px Manrope,sans-serif}.pcopy span{font-size:12px;color:#ddd}
+.dashboard{padding:12px 0 80px}.head{display:flex;align-items:end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:16px 0}.head h2{margin:0;font:800 31px Manrope,sans-serif}.head p{margin:5px 0 0;color:#777;font-size:13px}
+.filterbar{background:#fff;border:1px solid var(--line);border-radius:22px;padding:14px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-bottom:16px;box-shadow:0 8px 28px rgba(0,0,0,.03)}
+.field{display:grid;gap:6px}.field label{font-size:10px;font-weight:900;color:#777;text-transform:uppercase;letter-spacing:.07em}.field input,.field select{width:100%;border:1px solid var(--line);background:#fafaf7;border-radius:12px;padding:10px 11px;outline:none}.field input:focus,.field select:focus{border-color:#d2ba00;box-shadow:0 0 0 3px rgba(255,220,0,.15)}.reset{border:0;border-radius:12px;background:#111;color:#fff;font-weight:900;cursor:pointer}
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}.kpi{background:#fff;border:1px solid var(--line);border-radius:22px;padding:18px;min-height:136px;position:relative;overflow:hidden}.kpi:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--yellow)}.kpi:nth-child(2):before{background:var(--blue)}.kpi:nth-child(3):before{background:var(--green)}.kpi:nth-child(4):before{background:var(--orange)}.kpi:nth-child(5):before{background:var(--red)}.kpi:nth-child(6):before{background:#111}.kl{font-size:10px;color:#777;text-transform:uppercase;letter-spacing:.08em;font-weight:900}.kv{margin-top:12px;font:800 27px Manrope,sans-serif}.ks{margin-top:8px;color:#888;font-size:11px}
+.grid-main{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;margin-top:18px}.panel{background:#fff;border:1px solid var(--line);border-radius:24px;overflow:hidden}.phead{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;align-items:center}.phead h3{margin:0;font:800 17px Manrope,sans-serif}.phead span{color:#888;font-size:11px}.pbody{padding:18px}.chart{height:330px}
+.ai{background:#111;color:#fff;border-radius:24px;padding:22px;position:relative;overflow:hidden}.ai:after{content:"AI";position:absolute;right:-10px;bottom:-24px;font:900 130px Manrope,sans-serif;color:rgba(255,220,0,.06)}.aihead{display:flex;justify-content:space-between;gap:10px;align-items:center}.aihead h3{margin:0;font:800 21px Manrope,sans-serif}.aitag{padding:7px 10px;border-radius:999px;background:var(--yellow);color:#111;font-size:10px;font-weight:900}.insights{display:grid;gap:9px;margin-top:14px;position:relative;z-index:2}.insight{padding:12px 13px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08)}.insight strong{display:block;font-size:12px}.insight span{display:block;color:#bbb;font-size:11px;margin-top:4px}
+.power-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:18px}.chart-sm{height:280px}.cityrow{display:grid;grid-template-columns:1fr auto;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}.cityrow:last-child{border-bottom:0}.cityrow strong{font-size:13px}.cityrow small{display:block;color:#888}.mbar{height:6px;background:#efefe9;border-radius:99px;overflow:hidden;margin-top:6px}.mbar i{display:block;height:100%;background:linear-gradient(90deg,var(--yellow),#111)}
+.heat{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}.cell{padding:13px 9px;border-radius:15px;background:#fafaf7;border:1px solid var(--line);text-align:center}.cell strong{display:block;font-size:13px}.cell span{display:block;color:#777;font-size:10px;margin-top:3px}
+.feed{display:grid;gap:8px}.event{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}.event:last-child{border-bottom:0}.event strong{font-size:12px}.event span{font-size:11px;color:#888}
+.matrix{display:grid;grid-template-columns:120px repeat(4,1fr);gap:6px;font-size:11px}.matrix div{padding:9px;border-radius:10px;background:#fafaf7;border:1px solid var(--line)}.matrix .hdr{background:#111;color:#fff;font-weight:900}.matrix .rowh{font-weight:900}
+.note{margin-top:12px;padding:12px;border-radius:14px;background:#fff9cf;border:1px solid #eee08a;color:#635900;font-size:11px}
+.footer{background:#111;color:#aaa;padding:42px 0 50px}.footer-in{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}.footer strong{color:#fff}
+@media(max-width:1200px){.hero-grid,.grid-main{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(3,1fr)}.power-grid{grid-template-columns:1fr 1fr}.filterbar{grid-template-columns:repeat(3,1fr)}.gallery{grid-template-columns:1fr 1fr}}@media(max-width:760px){.wrap{width:calc(100% - 22px)}.nav{display:none}.hero-main{padding:28px}.kpis{grid-template-columns:1fr 1fr}.power-grid,.gallery{grid-template-columns:1fr}.filterbar{grid-template-columns:1fr 1fr}.visual-bottom{grid-template-columns:1fr}.heat{grid-template-columns:repeat(3,1fr)}.matrix{grid-template-columns:95px repeat(4,1fr);overflow:auto}}@media(max-width:520px){.kpis,.filterbar{grid-template-columns:1fr}}
+
+/* Professional header and hero refinement */
+.topin{
+  position:relative;
+  min-height:86px;
+}
+.brand{
+  min-width:280px;
+}
+.brand strong{
+  font-family:Manrope,sans-serif;
+  font-size:18px;
+  font-weight:900;
+  letter-spacing:-.02em;
+}
+.brand small{
+  font-weight:800;
+  letter-spacing:.11em;
+}
+.nav{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  gap:28px;
+  font-weight:900;
+}
+.nav a{
+  position:relative;
+  padding:28px 0 25px;
+}
+.nav a::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  right:50%;
+  bottom:18px;
+  height:3px;
+  background:var(--yellow);
+  border-radius:99px;
+  transition:.2s ease;
+}
+.nav a:hover::after{
+  left:0;
+  right:0;
+}
+.live{
+  min-width:180px;
+  text-align:center;
+  font-weight:900;
+  letter-spacing:.05em;
+  background:#111;
+  color:#fff;
+  border-color:#111;
+}
+.hero-main{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding:58px 56px;
+  background:
+    linear-gradient(0deg,rgba(7,7,7,.74),rgba(7,7,7,.54)),
+    linear-gradient(90deg,rgba(7,7,7,.42),rgba(7,7,7,.22)),
+    url("https://images.unsplash.com/photo-1513326738677-b964603b136d?auto=format&fit=crop&q=94&w=2400") center/cover;
+}
+.hero-main::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at 50% 35%,rgba(255,220,0,.14),transparent 35%),
+    linear-gradient(180deg,transparent 55%,rgba(0,0,0,.20));
+  pointer-events:none;
+}
+.hero-main > *{
+  position:relative;
+  z-index:2;
+}
+.hero-main h1{
+  max-width:980px;
+  margin-left:auto;
+  margin-right:auto;
+  text-align:center;
+}
+.hero-main p{
+  max-width:820px;
+  text-align:center;
+}
+.eyebrow{
+  background:rgba(255,255,255,.11);
+  border-color:rgba(255,255,255,.20);
+  box-shadow:0 10px 28px rgba(0,0,0,.16);
+}
+.chips{
+  justify-content:center;
+}
+.hero-visual{
+  border:1px solid rgba(0,0,0,.05);
+}
+.hero-visual::before{
+  content:"AI MOBILITY COMMAND CENTER";
+  position:absolute;
+  left:24px;
+  top:24px;
+  z-index:3;
+  padding:9px 13px;
+  border-radius:999px;
+  background:rgba(17,17,17,.78);
+  color:#fff;
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.12);
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.08em;
+}
+.head{
+  text-align:center;
+  display:block;
+  margin-top:28px;
+  margin-bottom:18px;
+}
+.head h2{
+  font-size:34px;
+  letter-spacing:-.04em;
+}
+.head p{
+  max-width:760px;
+  margin:7px auto 0;
+}
+.filterbar{
+  border-top:4px solid var(--yellow);
+  box-shadow:0 18px 46px rgba(0,0,0,.05);
+}
+.kpi{
+  box-shadow:0 10px 28px rgba(0,0,0,.035);
+  transition:transform .2s ease, box-shadow .2s ease;
+}
+.kpi:hover{
+  transform:translateY(-3px);
+  box-shadow:0 18px 38px rgba(0,0,0,.07);
+}
+.panel{
+  box-shadow:0 12px 34px rgba(0,0,0,.035);
+}
+.footer strong{
+  font-family:Manrope,sans-serif;
+  font-weight:800;
+}
+@media(max-width:1100px){
+  .nav{position:static;transform:none}
+}
+@media(max-width:760px){
+  .topin{min-height:76px}
+  .brand{min-width:0}
+  .brand strong{font-size:15px}
+  .hero-main{padding:34px 24px}
+}
+
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap topin">
+<div class="brand"><div class="logo">Go</div><div><strong>Yandex Go Taxi Intelligence</strong><small>AI-Powered Executive Mobility Analytics</small></div></div>
+<nav class="nav"><a href="#overview">Overview</a><a href="#dashboard">Dashboard</a><a href="#cities">Cities</a><a href="#activity">Activity</a></nav>
+<div class="live">AI-POWERED DASHBOARD</div>
+</div></header>
+
+<section class="hero" id="overview"><div class="wrap hero-grid">
+<article class="hero-card hero-main"><div class="eyebrow">AI-Powered Mobility Intelligence · Executive Analytics Platform</div>
+<h1>AI-Powered Taxi Intelligence <span class="yellow">for Smarter Decisions.</span></h1>
+<p>AI-powered taxi analytics for smarter operational decisions.</p>
+<div class="chips"><span class="chip">Live Analytics</span><span class="chip">Interactive Filters</span><span class="chip">AI Insights</span></div></article>
+<aside class="hero-card hero-visual"><div class="visual-bottom">
+<div class="glass"><small>Filtered gross sales</small><strong id="heroSales">—</strong><span id="heroTrips">—</span></div>
+<div class="glass dark"><small>AI operations signal</small><strong id="heroSignal">Stable</strong><span id="heroContext">All cities · all dates</span></div>
+</div></aside>
+</div>
+<div class="wrap gallery">
+<div class="photo" style="background-image:url('https://images.unsplash.com/photo-1513326738677-b964603b136d?auto=format&fit=crop&q=90&w=1400')"><div class="pcopy"><strong>Moscow mobility</strong><span>Russian architecture, roads and city-scale ride activity.</span></div></div>
+<div class="photo" style="background-image:url('https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&q=90&w=1200')"><div class="pcopy"><strong>Taxi operations</strong><span>Driver supply, demand peaks and fare intelligence.</span></div></div>
+<div class="photo" style="background-image:url('https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&q=90&w=1200')"><div class="pcopy"><strong>Road & city intelligence</strong><span>Operational context from movement across urban zones.</span></div></div>
+</div></section>
+
+<main class="dashboard" id="dashboard"><div class="wrap">
+<div class="head"><div><h2>AI-Powered Operations Intelligence Dashboard</h2><p id="updated">AI-powered analytics are ready — all visuals respond instantly to your filters.</p></div></div>
+
+<section class="filterbar">
+<div class="field"><label>Start date</label><input type="date" id="startDate"></div>
+<div class="field"><label>End date</label><input type="date" id="endDate"></div>
+<div class="field"><label>City</label><select id="cityFilter"><option value="all">All cities</option></select></div>
+<div class="field"><label>Service class</label><select id="classFilter"><option value="all">All classes</option><option>Economy</option><option>Comfort</option><option>Business</option><option>XL</option></select></div>
+<div class="field"><label>Weekday</label><select id="weekdayFilter"><option value="all">All days</option><option value="weekday">Weekdays</option><option value="weekend">Weekends</option></select></div>
+<button class="reset" id="resetBtn">Reset Filters</button>
+</section>
+
+<section class="kpis">
+<div class="kpi"><div class="kl">Gross Sales</div><div class="kv" id="sales">—</div><div class="ks">Filtered revenue</div></div>
+<div class="kpi"><div class="kl">Completed Trips</div><div class="kv" id="trips">—</div><div class="ks">Filtered ride volume</div></div>
+<div class="kpi"><div class="kl">Average Fare</div><div class="kv" id="fare">—</div><div class="ks">Weighted fare</div></div>
+<div class="kpi"><div class="kl">Active Drivers</div><div class="kv" id="drivers">—</div><div class="ks">Latest supply</div></div>
+<div class="kpi"><div class="kl">Cancellation Rate</div><div class="kv" id="cancel">—</div><div class="ks">Service friction</div></div>
+<div class="kpi"><div class="kl">Promo Spend</div><div class="kv" id="promo">—</div><div class="ks">Incentive investment</div></div>
+</section>
+
+<section class="grid-main">
+<div class="panel"><div class="phead"><div><h3>Revenue & Trips Over Time</h3><span>Line chart · responds to all slicers</span></div></div><div class="pbody"><div class="chart"><canvas id="salesChart"></canvas></div></div></div>
+<div class="ai"><div class="aihead"><h3>AI Analyst</h3><span class="aitag">Dynamic</span></div><div class="insights" id="insights"></div></div>
+</section>
+
+<section class="power-grid" id="cities">
+<div class="panel"><div class="phead"><div><h3>Revenue by City</h3><span>Horizontal bar</span></div></div><div class="pbody"><div class="chart-sm"><canvas id="cityRevenueChart"></canvas></div></div></div>
+<div class="panel"><div class="phead"><div><h3>Trips Share</h3><span>Doughnut chart</span></div></div><div class="pbody"><div class="chart-sm"><canvas id="cityChart"></canvas></div></div></div>
+<div class="panel"><div class="phead"><div><h3>Average Fare Trend</h3><span>Column chart</span></div></div><div class="pbody"><div class="chart-sm"><canvas id="fareChart"></canvas></div></div></div>
+</section>
+
+<section class="power-grid">
+<div class="panel"><div class="phead"><div><h3>Sales by Service Class</h3><span>Stack-style comparison</span></div></div><div class="pbody"><div class="chart-sm"><canvas id="classChart"></canvas></div></div></div>
+<div class="panel"><div class="phead"><div><h3>Trips vs Active Drivers</h3><span>Scatter chart</span></div></div><div class="pbody"><div class="chart-sm"><canvas id="scatterChart"></canvas></div></div></div>
+<div class="panel"><div class="phead"><div><h3>Cancellation Rate by City</h3><span>Performance bar</span></div></div><div class="pbody"><div class="chart-sm"><canvas id="cancelChart"></canvas></div></div></div>
+</section>
+
+<section class="power-grid">
+<div class="panel"><div class="phead"><div><h3>Revenue Composition</h3><span>Polar area</span></div></div><div class="pbody"><div class="chart-sm"><canvas id="polarChart"></canvas></div></div></div>
+<div class="panel"><div class="phead"><div><h3>Driver Supply Trend</h3><span>Area line</span></div></div><div class="pbody"><div class="chart-sm"><canvas id="driverChart"></canvas></div></div></div>
+<div class="panel"><div class="phead"><div><h3>Promo Spend by City</h3><span>Bar chart</span></div></div><div class="pbody"><div class="chart-sm"><canvas id="promoChart"></canvas></div></div></div>
+</section>
+
+<section class="power-grid">
+<div class="panel"><div class="phead"><div><h3>City Revenue Ranking</h3><span>Table-style visual</span></div></div><div class="pbody" id="cityList"></div></div>
+<div class="panel"><div class="phead"><div><h3>Hourly Demand Heat</h3><span>Heatmap-style visual</span></div></div><div class="pbody"><div class="heat" id="heat"></div></div></div>
+<div class="panel"><div class="phead"><div><h3>Service Matrix</h3><span>Power BI-style matrix</span></div></div><div class="pbody"><div class="matrix" id="matrix"></div></div></div>
+</section>
+
+<section class="power-grid" id="activity">
+<div class="panel"><div class="phead"><div><h3>Live Operations Feed</h3><span>Operational event stream</span></div></div><div class="pbody"><div class="feed" id="feed"></div></div></div>
+<div class="panel"><div class="phead"><div><h3>Day-of-Week Sales</h3><span>Radar chart</span></div></div><div class="pbody"><div class="chart-sm"><canvas id="radarChart"></canvas></div></div></div>
+<div class="panel"><div class="phead"><div><h3>Executive Summary</h3><span>Filtered view</span></div></div><div class="pbody"><div id="summaryText"></div><div class="note"><strong>Data note:</strong> Operational values are presented within this dashboard for analytical visualization and decision-support purposes.</div></div></div>
+</section>
+</div></main>
+
+<footer class="footer"><div class="wrap footer-in"><div><strong>Yandex Go Taxi — AI Sales Intelligence</strong><br><span>AI-powered taxi analytics and executive intelligence dashboard.</span></div><div style="text-align:right"><strong>Designed & Developed by Talha Nazir</strong><br><span>© 2026 Talha Nazir. All Rights Reserved.</span></div></div></footer>
+
+<script>
+const CITIES=["Moscow","St Petersburg","Kazan","Yekaterinburg","Novosibirsk","Sochi"];
+const CLASSES=["Economy","Comfort","Business","XL"];
+const BASE={Moscow:[7800,1320,3950],"St Petersburg":[4700,1160,2480],Kazan:[1850,1010,1040],Yekaterinburg:[1660,1040,930],Novosibirsk:[1420,990,810],Sochi:[1120,1210,700]};
+let rows=[],charts={};
+function seeded(seed){let x=Math.sin(seed)*10000;return x-Math.floor(x)}
+function build(){
+ rows=[];const now=new Date();
+ for(let d=59;d>=0;d--){const date=new Date(now);date.setDate(now.getDate()-d);const day=date.getDay(),weekend=(day===0||day===6);
+ CITIES.forEach((city,ci)=>CLASSES.forEach((cls,cl)=>{
+  const [baseTrips,baseFare,drivers]=BASE[city],share=[.55,.28,.11,.06][cl],mult=[.72,1.05,1.95,1.35][cl];
+  const trend=1+(59-d)*.0026,noise=.9+seeded(d*17+ci*37+cl*13)*.20,wk=weekend?1.09:1;
+  const trips=Math.max(1,Math.round(baseTrips*share*wk*trend*noise));
+  const fare=Math.round(baseFare*mult*(.95+seeded(d*23+ci*11+cl*7)*.13));
+  const sales=trips*fare,cancels=Math.round(trips*(.04+seeded(d*31+ci*7+cl*3)*.06)),promo=Math.round(sales*(.04+seeded(d*19+ci*5+cl)*.04));
+  rows.push({date:date.toISOString().slice(0,10),city,cls,trips,fare,sales,drivers:Math.round(drivers*(.9+seeded(d*41+ci*3)*.18)),cancels,promo,weekend,weekday:day});
+ }))}}
+const rub=n=>"₽"+new Intl.NumberFormat("en-US",{maximumFractionDigits:0}).format(n||0),num=n=>new Intl.NumberFormat("en-US",{maximumFractionDigits:0}).format(n||0);
+function filtered(){return rows.filter(r=>{
+ const dt=r.date;return(!startDate.value||dt>=startDate.value)&&(!endDate.value||dt<=endDate.value)&&(cityFilter.value==="all"||r.city===cityFilter.value)&&(classFilter.value==="all"||r.cls===classFilter.value)&&(weekdayFilter.value==="all"||(weekdayFilter.value==="weekend"?r.weekend:!r.weekend))
+})}
+function agg(d){let trips=d.reduce((s,x)=>s+x.trips,0),sales=d.reduce((s,x)=>s+x.sales,0),c=d.reduce((s,x)=>s+x.cancels,0),promo=d.reduce((s,x)=>s+x.promo,0),fare=trips?d.reduce((s,x)=>s+x.fare*x.trips,0)/trips:0,latest=[...d].sort((a,b)=>a.date.localeCompare(b.date)).at(-1);return{trips,sales,c,promo,fare,drivers:latest?.drivers||0,cr:(trips+c)?c/(trips+c)*100:0}}
+function group(d,key){const m={};d.forEach(x=>{const k=x[key];m[k]??={key:k,sales:0,trips:0,c:0,promo:0,fw:0,drivers:0,n:0};m[k].sales+=x.sales;m[k].trips+=x.trips;m[k].c+=x.cancels;m[k].promo+=x.promo;m[k].fw+=x.fare*x.trips;m[k].drivers+=x.drivers;m[k].n++});return Object.values(m).map(x=>({...x,fare:x.trips?x.fw/x.trips:0,drivers:x.n?x.drivers/x.n:0,cr:(x.trips+x.c)?x.c/(x.trips+x.c)*100:0}))}
+function destroy(id){charts[id]?.destroy()}
+function line(id,labels,datasets,options={}){destroy(id);charts[id]=new Chart(document.getElementById(id),{type:"line",data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:"index",intersect:false},plugins:{legend:{position:"bottom"}},scales:{y:{beginAtZero:true,grid:{color:"rgba(0,0,0,.05)"}},x:{grid:{display:false}}},...options}})}
+function bar(id,labels,data,label="Value",horizontal=false){destroy(id);charts[id]=new Chart(document.getElementById(id),{type:"bar",data:{labels,datasets:[{label,data,borderRadius:8,borderWidth:0}]},options:{indexAxis:horizontal?"y":"x",responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:"rgba(0,0,0,.05)"}},x:{grid:{display:false}}}}})}
+function render(){
+ const d=filtered();if(!d.length)return;
+ const a=agg(d),byDate=group(d,"date").sort((a,b)=>a.key.localeCompare(b.key)),byCity=group(d,"city").sort((a,b)=>b.sales-a.sales),byClass=group(d,"cls").sort((a,b)=>b.sales-a.sales);
+ sales.textContent=rub(a.sales);trips.textContent=num(a.trips);fare.textContent=rub(a.fare);drivers.textContent=num(a.drivers);cancel.textContent=a.cr.toFixed(1)+"%";promo.textContent=rub(a.promo);heroSales.textContent=rub(a.sales);heroTrips.textContent=num(a.trips)+" completed trips";
+ heroContext.textContent=`${cityFilter.value==="all"?"All cities":cityFilter.value} · ${classFilter.value==="all"?"All classes":classFilter.value}`;
+ const mid=Math.floor(byDate.length/2),f=byDate.slice(0,mid).reduce((s,x)=>s+x.sales,0),s=byDate.slice(mid).reduce((s,x)=>s+x.sales,0),growth=f?(s-f)/f*100:0;heroSignal.textContent=growth>5?"Growing":growth<-5?"Watch":"Stable";
+ line("salesChart",byDate.map(x=>new Date(x.key).toLocaleDateString([],{month:"short",day:"numeric"})),[{label:"Revenue",data:byDate.map(x=>x.sales),borderWidth:3,tension:.35},{label:"Trips",data:byDate.map(x=>x.trips),borderWidth:2,tension:.35}],{});
+ bar("cityRevenueChart",byCity.map(x=>x.key),byCity.map(x=>x.sales),"Revenue",true);
+ destroy("cityChart");charts.cityChart=new Chart(cityChart,{type:"doughnut",data:{labels:byCity.map(x=>x.key),datasets:[{data:byCity.map(x=>x.trips),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom"}}}});
+ bar("fareChart",byDate.slice(-18).map(x=>new Date(x.key).toLocaleDateString([],{month:"short",day:"numeric"})),byDate.slice(-18).map(x=>x.fare),"Average Fare");
+ bar("classChart",byClass.map(x=>x.key),byClass.map(x=>x.sales),"Sales");
+ destroy("scatterChart");charts.scatterChart=new Chart(scatterChart,{type:"scatter",data:{datasets:[{label:"Cities",data:byCity.map(x=>({x:Math.round(x.drivers),y:x.trips,label:x.key}))}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.raw.label}: ${num(c.raw.y)} trips / ${num(c.raw.x)} drivers`}}},scales:{x:{title:{display:true,text:"Avg active drivers"}},y:{title:{display:true,text:"Trips"},beginAtZero:true}}}});
+ bar("cancelChart",byCity.map(x=>x.key),byCity.map(x=>+x.cr.toFixed(1)),"Cancellation %",true);
+ destroy("polarChart");charts.polarChart=new Chart(polarChart,{type:"polarArea",data:{labels:byClass.map(x=>x.key),datasets:[{data:byClass.map(x=>x.sales),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom"}}}});
+ line("driverChart",byDate.map(x=>new Date(x.key).toLocaleDateString([],{month:"short",day:"numeric"})),[{label:"Avg Drivers",data:byDate.map(x=>Math.round(x.drivers)),borderWidth:3,tension:.35,fill:true}],{});
+ bar("promoChart",byCity.map(x=>x.key),byCity.map(x=>x.promo),"Promo Spend");
+ const wd=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],wmap=Array.from({length:7},(_,i)=>({key:i,sales:0}));d.forEach(r=>wmap[r.weekday].sales+=r.sales);
+ destroy("radarChart");charts.radarChart=new Chart(radarChart,{type:"radar",data:{labels:wd,datasets:[{label:"Sales",data:wmap.map(x=>x.sales),borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+ cityList.innerHTML=byCity.map(c=>`<div class="cityrow"><div><strong>${c.key}</strong><small>${num(c.trips)} trips · ${c.cr.toFixed(1)}% cancel</small><div class="mbar"><i style="width:${Math.max(5,c.sales/(byCity[0]?.sales||1)*100)}%"></i></div></div><strong>${rub(c.sales)}</strong></div>`).join("");
+ const hours=[7,9,12,15,18,21,23,1,4,6,10,20],idx=[58,92,66,61,100,88,72,45,31,64,79,96];heat.innerHTML=hours.map((h,i)=>`<div class="cell" style="background:rgba(255,220,0,${.08+idx[i]/200})"><strong>${String(h).padStart(2,"0")}:00</strong><span>Demand ${idx[i]}</span></div>`).join("");
+ matrix.innerHTML=`<div class="hdr">City</div>${CLASSES.map(x=>`<div class="hdr">${x}</div>`).join("")}`+CITIES.map(c=>`<div class="rowh">${c}</div>${CLASSES.map(cl=>{let x=d.filter(r=>r.city===c&&r.cls===cl);return `<div>${rub(x.reduce((s,r)=>s+r.sales,0))}</div>`}).join("")}`).join("");
+ feed.innerHTML=[["Moscow airport corridor demand rising","SVO / DME pickup activity increasing"],["City-center cancellation pressure eased","Supply coverage improved"],["Comfort-class demand accelerating","Evening premium demand strengthened"],["Promo efficiency stable","Current spend remains within target band"],["Driver coverage increased","Peak-hour supply improved"]].map((e,i)=>`<div class="event"><div><strong>${e[0]}</strong><span>${e[1]}</span></div><span>${i*4+2} min ago</span></div>`).join("");
+ insights.innerHTML=[["Revenue momentum",`Recent-half sales are ${Math.abs(growth).toFixed(1)}% ${growth>=0?"higher":"lower"} than the earlier half.`],["Top city",`${byCity[0]?.key||"—"} leads with ${rub(byCity[0]?.sales||0)}.`],["Best class",`${byClass[0]?.key||"—"} contributes the largest sales value in this filtered view.`],["Cancellation pressure",`${a.cr.toFixed(1)}% current rate. ${a.cr>9?"Operational attention recommended.":"Pressure remains controlled."}`],["Promo intensity",`${(a.sales?a.promo/a.sales*100:0).toFixed(1)}% of sales is being spent on promotions.`]].map(x=>`<div class="insight"><strong>${x[0]}</strong><span>${x[1]}</span></div>`).join("");
+ summaryText.innerHTML=`<p><strong>${num(a.trips)}</strong> trips generated <strong>${rub(a.sales)}</strong> in gross sales.</p><p><strong>${byCity[0]?.key||"—"}</strong> is the leading city and <strong>${byClass[0]?.key||"—"}</strong> is the leading service class in the current slicer context.</p><p>Average fare is <strong>${rub(a.fare)}</strong>, while cancellation rate is <strong>${a.cr.toFixed(1)}%</strong>.</p>`;
+ updated.textContent=`Filtered view · ${d.length} underlying records · ${startDate.value} to ${endDate.value}`;
+}
+function resetFilters(){const dates=rows.map(r=>r.date).sort();startDate.value=dates[0];endDate.value=dates.at(-1);cityFilter.value="all";classFilter.value="all";weekdayFilter.value="all";render()}
+build();CITIES.forEach(c=>cityFilter.insertAdjacentHTML("beforeend",`<option>${c}</option>`));const dates=rows.map(r=>r.date).sort();startDate.min=dates[0];startDate.max=dates.at(-1);endDate.min=dates[0];endDate.max=dates.at(-1);startDate.value=dates[0];endDate.value=dates.at(-1);
+[startDate,endDate,cityFilter,classFilter,weekdayFilter].forEach(el=>el.addEventListener("change",render));resetBtn.addEventListener("click",resetFilters);render();
+</script>
+</body>
+</html>
